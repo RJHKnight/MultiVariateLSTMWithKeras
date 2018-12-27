@@ -3,6 +3,8 @@ library(tidyverse)
 library(magrittr)
 library(lubridate)
 
+set.seed(123456)
+
 # Load the file from the mirror - this generates some warnings for trailing characters, but data is correct.
 pollution <- read_csv("https://raw.githubusercontent.com/jbrownlee/Datasets/master/pollution.csv")
 
@@ -21,7 +23,8 @@ pollution %<>%
     wnd_spd = Iws,
     snow = Is,
     rain = Ir
-  )
+  ) %>%
+  mutate(wnd_dir = as.factor(wnd_dir))
 
 # Check data - as expected, All NA's for pollution column in the first day
 summary(pollution)
@@ -60,3 +63,11 @@ pollution %>%
   geom_line() + 
   facet_wrap(~ type, scales = "free_y")
 
+# Add in the one step ahead prediction...
+pollution %<>%
+  mutate(nextPollution = lead(pollution, 1)) %>%
+  filter(complete.cases(.))
+
+# Now split into testing and training - the blog uses the first year for training and the rest for testing!
+pollution.train <- filter(pollution, year(date) == 2010)
+pollution.test <- filter(pollution, year(date) != 2010)
