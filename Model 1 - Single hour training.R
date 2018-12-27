@@ -50,3 +50,15 @@ ranges <- trained_rec$steps[[1]]$ranges
 yhat <- yhat * ranges[2,1]
 
 rmse <- sqrt(mean((yhat - pollution.test$nextPollution)^2))
+
+pollution.test$predictedValue <- yhat
+
+# Simple plot of predicted vs actual for a short period...
+pollution.test %>%
+  filter(between(date, ymd_h("2012-01-01 0"), ymd_h("2012-01-31 23"))) %>%
+  mutate(week = week(date)) %>%
+  select(date, week, nextPollution, predictedValue) %>%
+  gather(type, value, -date, -week) %>%
+  ggplot(., aes(date, value, colour = type)) + 
+  geom_line() + 
+  facet_wrap(~ week, scales = "free")
