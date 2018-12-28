@@ -1,10 +1,12 @@
 library(recipes)
 library(keras)
 
+#source("LoadData.R")
+
 # Model 1: Training the model to predict based on only 1 previous time step (this isn't really using the LSTM to the best of its ability...)
 
 # Scaling is done based on all data
-recipe <- recipe(nextPollution ~ pollution + dew + temp + press + wnd_dir + wnd_spd + snow +rain, data = pollution)
+recipe <- recipe(nextPollution ~ pollution + dew + temp + press + wnd_dir + wnd_spd + snow + rain, data = pollution)
 
 # Scale numeric variables to [0,1] and one hot encode the factor.
 scaledAndCentered <- recipe %>%
