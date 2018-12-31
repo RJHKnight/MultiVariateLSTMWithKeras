@@ -25,3 +25,34 @@ reshapeForLSTM <- function(originalDF, numTimeSteps, columnsToExclude) {
   
   return (originalDF)
 }
+
+reshapeForLSTMLoop <- function(originalDF, numTimeSteps, columnsToExclude) {
+  
+  originalDF <- as.data.frame(originalDF)
+  
+  colNames <- colnames(originalDF)
+  newMatrix <- as.matrix(originalDF[,!colNames %in% columnsToExclude])
+  
+  for (i in 1:ncol(originalDF)) {
+    
+    thisColName <- colNames[i]
+    
+    if (thisColName %in% columnsToExclude) {
+      next
+    }
+    
+    laggedColumns <- sapply(1:numTimeSteps, function(x) {
+      c(rep(NA, x), head(originalDF[,i], -x))
+    })
+    
+    colnames(laggedColumns) <- paste0(thisColName, "_", 1:numTimeSteps)
+    
+    newMatrix <- cbind(newMatrix, laggedColumns)
+  }
+  
+  # Remove NAs
+  newMatrix <- newMatrix[complete.cases(newMatrix),]
+  
+  dim(newMatrix) <- c(nrow(newMatrix),numTimeSteps+1,ncol(newMatrix)/(numTimeSteps+1))
+  return (newMatrix)
+}
