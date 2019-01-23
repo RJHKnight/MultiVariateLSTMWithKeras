@@ -4,6 +4,7 @@ library(magrittr)
 library(lubridate)
 
 set.seed(123456)
+Sys.setenv(TZ='UTC')
 
 # Load the file from the mirror - this generates some warnings for trailing characters, but data is correct.
 pollution <- read_csv("https://raw.githubusercontent.com/jbrownlee/Datasets/master/pollution.csv")
